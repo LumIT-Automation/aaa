@@ -1,0 +1,26 @@
+Authentication & Authorization schema
+
+Any consumer needs a JWT token in order to be authorized to communicate with any downstream producer service.
+The consumer obtains a JWT token from the Single Sign On gateway service via its HTTP REST JSON API interface, providing a username / password, using the OAuth2 protocol.
+Urls are like:
+    - /api/v1/token/
+    - /api/v1/token/refresh/The JWT token embeds information regarding the user, their groups and roles.
+
+User's information is fetched from the corporate's identity provider / directory services.
+SSO supports the following identity providers:
+    - LDAP
+    - Active Directory
+    - Radius
+
+The JWT token is signed with a private RSA key and assigned a limited time-range validity.
+The SSO service logs any user action via a syslog-ng subsystem.
+
+
+Downstream services
+
+Any downstream service will validate the signed JWT token provided by the consumer:
+    - if it's still valid;
+    - if it's correctly signed - any service knows the public RSA key corresponding to the SSO's private.
+
+For a valid JWT token, the service will authenticate and authorize the consumer, basing on users/groups/roles information embedded within the JWT token.
+The service logs any user action via a syslog-ng subsystem.

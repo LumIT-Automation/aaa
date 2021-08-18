@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ "$1" == "purge" ]; then
+    if podman volume ls | awk '{print $2}' | grep -q ^sso$; then
+        printf "\n* Clean up sso volume...\n"
+        podman volume rm -f sso
+        podman volume rm -f sso-db
+    fi
+fi
+
+# Force debconf cleanup.
+echo PURGE | debconf-communicate automation-interface-sso-container
+
+exit 0

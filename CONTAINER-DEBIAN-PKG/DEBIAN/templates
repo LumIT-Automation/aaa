@@ -1,0 +1,69 @@
+Template: automation-interface-sso/choose_backend
+Type: multiselect
+Choices: Active Directory, RADIUS
+Description: Choose the authentication backend for your setup
+  Choose authentication backend
+
+Template: automation-interface-sso/automation_interface_admin_password
+Type: password
+Description: Insert the password for admin@automation.local (local admin user, who is always enabled to login, even if external identity provider isn't working).
+  Admin password
+
+Template: automation-interface-sso/radius_server
+Type: string
+Description: Insert the FQDN or IP address of the RADIUS server
+  RADIUS address
+
+Template: automation-interface-sso/radius_port
+Type: string
+Description: Insert the port number of the RADIUS server
+  RADIUS port
+
+Template: automation-interface-sso/radius_password
+Type: password
+Description: Insert the password of the RADIUS server
+  RADIUS password
+
+Template: automation-interface-sso/ad_server
+Type: string
+Description: Insert the FQDN or IP address of the Active Directory server
+  AD address
+
+Template: automation-interface-sso/ad_domain
+Type: string
+Description: Insert the fqdn of the Active Directory domain
+  AD Domain
+
+Template: automation-interface-sso/ad_token_user
+Type: string
+Description: Insert the user to connect to the AD server and check the authentication
+  AD token user
+
+Template: automation-interface-sso/ad_token_passwd
+Type: password
+Description: Insert the password for user to connect to the AD server and check the authentication
+  AD token user password
+
+Template: automation-interface-sso/ad_required_group
+Type: string
+Description: Insert the AD group required to login in the automation tool web interface
+  AD Required group
+
+Template: automation-interface-sso/ad_userPrincipalName
+Type: boolean
+Description: Allow to login using the userPrincipalName as username (eg: user@example.com)
+  AD userPrincipalName
+
+Template: automation-interface-sso/ou_users
+Type: string
+Description: CN/OU where users are found in the active directory (default in AD: CN=Users)
+  AD OU users
+
+Template: automation-interface-sso/ou_groups
+Type: string
+Description: CN/OU where groups are found in the active directory (default in AD: CN=Users)
+  AD OU groups
+
+Template: automation-interface-sso/superadmin_AD_groups
+Type: string
+Description: DN of the active directory groups that are configured as superadmin

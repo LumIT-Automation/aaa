@@ -1,0 +1,10 @@
+cryptography~=3.4.7
+Django~=3.2
+djangorestframework~=3.12.4
+django-auth-ldap~=2.4.0
+djangorestframework-simplejwt~=4.6.0
+django-radius~=1.5.0
+mysqlclient~=2.0.3
+PyJWT~=2.0.1 # if updating: rest_framework_simplejwt/backends.py, fix return token.decode('utf-8').
+urllib3~=1.26.4
+requests~=2.25.1

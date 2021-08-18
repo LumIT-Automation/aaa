@@ -1,0 +1,262 @@
+{
+	"info": {
+		"_postman_id": "dba9c5ae-3769-464c-8952-d15b2550f465",
+		"name": "sso",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "/",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://10.0.111.100/api/v1/",
+					"protocol": "http",
+					"host": [
+						"10",
+						"0",
+						"111",
+						"100"
+					],
+					"path": [
+						"api",
+						"v1",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "superadmins",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jtwtoken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://10.0.111.100/api/v1/superadmins/",
+					"protocol": "http",
+					"host": [
+						"10",
+						"0",
+						"111",
+						"100"
+					],
+					"path": [
+						"api",
+						"v1",
+						"superadmins",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Token (local admin)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"admin@automation.local\",\n    \"password\": \"password\" \n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://10.0.111.100/api/v1/token/",
+					"protocol": "http",
+					"host": [
+						"10",
+						"0",
+						"111",
+						"100"
+					],
+					"path": [
+						"api",
+						"v1",
+						"token",
+						""
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Token (radius)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"user-tigers\",\n    \"password\": \"password\" \n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://10.0.111.100/api/v1/token/",
+					"protocol": "http",
+					"host": [
+						"10",
+						"0",
+						"111",
+						"100"
+					],
+					"path": [
+						"api",
+						"v1",
+						"token",
+						""
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Token (ad; groupAdmin)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"userAdmin\",\n    \"password\": \"password\" \n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://10.0.111.100/api/v1/token/",
+					"protocol": "http",
+					"host": [
+						"10",
+						"0",
+						"111",
+						"100"
+					],
+					"path": [
+						"api",
+						"v1",
+						"token",
+						""
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Token (ad; groupStaff)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"userStaff\",\n    \"password\": \"password\" \n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://10.0.111.100/api/v1/token/",
+					"protocol": "http",
+					"host": [
+						"10",
+						"0",
+						"111",
+						"100"
+					],
+					"path": [
+						"api",
+						"v1",
+						"token",
+						""
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Token (ad; groupReadOnly)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"userRo1\",\n    \"password\": \"password\" \n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://10.0.111.100/api/v1/token/",
+					"protocol": "http",
+					"host": [
+						"10",
+						"0",
+						"111",
+						"100"
+					],
+					"path": [
+						"api",
+						"v1",
+						"token",
+						""
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

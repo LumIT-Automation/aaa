@@ -1,0 +1,4 @@
+/var/www/aaa/aaa/settings.py
+/var/www/aaa/aaa/settings_jwt.py
+/var/www/aaa/aaa/identityProvider/ldap_conf.py
+/var/www/aaa/aaa/identityProvider/radius_conf.py

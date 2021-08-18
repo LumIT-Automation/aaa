@@ -1,0 +1,13 @@
+#!/bin/bash
+
+printf "\n* Container prerm...\n"
+printf "\n* Cleanup...\n"
+if podman ps | awk '{print $2}' | grep -q ^localhost/sso$; then
+    podman stop sso
+fi
+
+if podman images | awk '{print $1}' | grep -q ^localhost/sso$; then
+    podman rmi -f sso
+fi
+
+exit 0

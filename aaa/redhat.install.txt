@@ -1,0 +1,28 @@
+Here there are the steps needed:
+
+    - Set the local admin (admin@automation.local) password (on the HOST): /usr/bin/sso-reset-admin-password.sh <password>
+
+    - Configure the authentication backend.
+      Currently, the supported authentication backends are: active directory, openldap and radius.
+
+      The configuration files are contained in the /var/lib/containers/storage/volumes/sso/_data/identityProvider folder.
+        * Active directory: configure the file ad_conf.py.
+            There is a helper script which does some preliminary configuration: /usr/bin/ad_conf_generator.sh (on the HOST) for that.
+            Example: /usr/bin/ad_conf_generator.sh -i 10.0.111.110 -d lab.local -u adToken -p a -P -G groupRequired > /var/lib/containers/storage/volumes/sso/_data/identityProvider/ad_conf.py
+            COMPLETE CONFIGURATION MUST BE PERFORMED MANUALLY!
+
+            Within sso container (podman exec -it sso bash), useful debug:
+                curl --location --request POST 'http://10.0.111.100/api/v1/token/' \
+                --header 'Content-Type: application/json' \
+                --data-raw '{
+                    "username": "admin@automation.local",
+                    "password": "CHOSEN_PASSWORD"
+                }'
+
+        * openldap: configure the file ldap_conf.py.
+        * radius: configure the file radius_conf.py.
+
+    - If needed, associate one or more AD groups to the superadmin user:
+      set the SUPERADMIN_IDENTITY_AD_GROUPS list variable in /var/lib/containers/storage/volumes/sso/_data/settings.py with the DNs of these groups.
+
+      --> systemctl restart automation-interface-sso-container.service

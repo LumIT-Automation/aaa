@@ -1,0 +1,317 @@
+#!/bin/bash
+
+set -e
+
+. /usr/share/debconf/confmodule # do not move this line.
+
+printf "\n* Container postinst...\n"
+if [ "$1" == "configure" ]; then
+    printf "\n* Building podman image...\n"
+    cd /usr/lib/sso
+
+    # Build container image.
+    buildah bud -t sso .
+
+    # First container run: associate name, bind ports, bind fs volume, define init process, ...
+    # sso folder will be bound to /var/lib/containers/storage/volumes/.
+    # Until the package is not uninstalled+purged, fs volumes remain untouched -> newly installed package's configuration files are then rewritten with volume's ones (this is why some services are restarted).
+    # Side effect is that new package's configuration directives are ignored, so the user must be informed ("Differences from stock config").
+    podman run --name sso -v sso:/var/www/aaa/aaa -v sso-db:/var/lib/mysql -dt localhost/sso /sbin/init
+    podman exec sso chown www-data:www-data /var/www/aaa/aaa
+
+    podman exec sso chown mysql:mysql /var/lib/mysql # within container.
+    podman exec sso systemctl restart mysql
+
+    printf "\n* Starting Container Service on HOST...\n"
+    systemctl daemon-reload
+    systemctl start automation-interface-sso-container # (upon installation, container is already run, so this line is actually redundant).
+    systemctl enable automation-interface-sso-container
+
+    printf "\n* Configuring container...\n"
+    # Setup a Django secret key (per-installation): using host-bound folders.
+    djangoSecretKey=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)
+    sed -i "s|^SECRET_KEY =.*|SECRET_KEY = \"$djangoSecretKey\"|g" /var/lib/containers/storage/volumes/sso/_data/settings.py
+
+    # Configure only if not already configured.
+    if ! grep -Eq 'BEGIN RSA PRIVATE KEY' /var/lib/containers/storage/volumes/sso/_data/settings_jwt.py; then # container's file.
+        # Setup the JWT token keypair (per-installation).
+        # Generate the TLS key and replace in settings_jwt.py.
+        podman exec sso jwtkey-generate.sh
+        podman exec sso chown www-data:www-data /var/www/aaa/aaa/settings_jwt.py
+        podman exec sso chmod 400 /var/www/aaa/aaa/settings_jwt.py
+    fi
+
+    # Configure only if not already configured (check a semaphore).
+    if [ ! -f /var/lib/containers/storage/volumes/sso/_data/configuration.performed ]; then
+        # Via debconf.
+        db_version 2.0
+
+        db_beginblock
+            db_input critical automation-interface-sso/automation_interface_admin_password
+        db_endblock
+
+        db_beginblock
+            db_input critical automation-interface-sso/choose_backend
+        db_endblock
+
+        db_go || true
+        
+        backends=""
+        db_get automation-interface-sso/choose_backend
+        if [ -n "$RET" ]; then
+            backends="$RET"
+        fi
+
+        if echo $backends | grep -q 'RADIUS'; then
+            db_get automation-interface-sso/radius_server
+            if [ -z "$RET" ]; then
+                # Ask if not preseeded.
+                db_beginblock
+                    db_input critical automation-interface-sso/radius_server
+                db_endblock
+            fi
+
+            db_get automation-interface-sso/radius_port
+            if [ -z "$RET" ]; then
+                db_beginblock
+                    db_set automation-interface-sso/radius_port 1812 # preset.
+                    db_input critical automation-interface-sso/radius_port
+                db_endblock
+            fi
+
+            db_get automation-interface-sso/radius_password
+            if [ -z "$RET" ]; then
+                db_beginblock
+                    db_input critical automation-interface-sso/radius_password
+                db_endblock
+            fi
+        fi
+
+        if echo $backends | grep -q 'Active Directory'; then
+            db_get automation-interface-sso/ad_server
+            if [ -z "$RET" ]; then
+                # Ask if not preseeded.
+                db_beginblock
+                    db_set automation-interface-sso/ad_server "ip_address_of_ad_server" # preset.
+                    db_input critical automation-interface-sso/ad_server
+                db_endblock
+            fi
+
+            db_get automation-interface-sso/ad_domain
+            if [ -z "$RET" ]; then
+                # Ask if not preseeded.
+                db_beginblock
+                    db_set automation-interface-sso/ad_domain "lab.local" # preset.
+                    db_input critical automation-interface-sso/ad_domain
+                db_endblock
+            fi
+
+            db_get automation-interface-sso/ad_token_user
+            if [ -z "$RET" ]; then
+                # Ask if not preseeded.
+                db_beginblock
+                    db_set automation-interface-sso/ad_token_user "adUser" # preset.
+                    db_input critical automation-interface-sso/ad_token_user
+                db_endblock
+            fi
+
+            db_get automation-interface-sso/ad_token_passwd
+            if [ -z "$RET" ]; then
+                # Ask if not preseeded.
+                db_beginblock
+                    db_input critical automation-interface-sso/ad_token_passwd
+                db_endblock
+            fi
+
+            db_get automation-interface-sso/ad_required_group
+            if [ -z "$RET" ]; then
+                # Ask if not preseeded.
+                db_beginblock
+                    db_set automation-interface-sso/ad_required_group "groupRequired" # preset.
+                    db_input critical automation-interface-sso/ad_required_group
+                db_endblock
+            fi
+
+            db_get automation-interface-sso/ad_userPrincipalName
+
+            if [ -z "$RET" ]; then
+                # Ask if not preseeded.
+                db_beginblock
+                    db_input critical automation-interface-sso/ad_userPrincipalName
+                db_endblock
+            fi
+
+            db_get automation-interface-sso/ou_users
+            if [ -z "$RET" ]; then
+                db_beginblock
+                    db_set automation-interface-sso/ou_users "CN=Users" # preset.
+                    db_input critical automation-interface-sso/ou_users
+                db_endblock
+            fi
+
+            db_get automation-interface-sso/ou_groups
+            if [ -z "$RET" ]; then
+                db_beginblock
+                    db_set automation-interface-sso/ou_groups "CN=Users" # preset.
+                    db_input critical automation-interface-sso/ou_groups
+                db_endblock
+            fi
+
+            db_get automation-interface-sso/superadmin_AD_groups
+            if [ -z "$RET" ]; then
+                # Ask if not preseeded.
+                db_beginblock
+                    db_input critical automation-interface-sso/superadmin_AD_groups
+                db_endblock
+            fi
+        fi
+
+        db_go || true
+
+        db_get automation-interface-sso/radius_server
+        if [ -n "$RET" ]; then
+            sed -i "s|^RADIUS_SERVER =.*|RADIUS_SERVER = \"$RET\"|g" /var/lib/containers/storage/volumes/sso/_data/identityProvider/radius_conf.py
+        fi
+
+        db_get automation-interface-sso/radius_port
+        if [ -n "$RET" ]; then
+            sed -i "s|^RADIUS_PORT =.*|RADIUS_PORT = $RET|g" /var/lib/containers/storage/volumes/sso/_data/identityProvider/radius_conf.py
+        fi
+
+        db_get automation-interface-sso/radius_password
+        if [ -n "$RET" ]; then
+            sed -i "s|^RADIUS_SECRET =.*|RADIUS_SECRET = \"$RET\"|g" /var/lib/containers/storage/volumes/sso/_data/identityProvider/radius_conf.py
+        fi
+
+        adOptions=""
+        db_get automation-interface-sso/ad_server
+        if [ -n "$RET" ]; then
+            adServer="$RET"
+        fi
+
+        db_get automation-interface-sso/ad_domain
+        if [ -n "$RET" ]; then
+            adDomain="$RET"
+        fi
+
+        db_get automation-interface-sso/ad_token_user
+        if [ -n "$RET" ]; then
+            adTokenUser="$RET"
+        fi
+
+        db_get automation-interface-sso/ad_token_passwd
+        if [ -n "$RET" ]; then
+            adTokenPasswd="$RET"
+        fi
+       
+        if [ -n "$adServer" ] && [ -n "$adDomain" ] && [ -n "adTokenUser" ] && [ -n "adTokenPasswd" ]; then
+            adOptions="-i $adServer -d $adDomain -u $adTokenUser -p $adTokenPasswd"
+        fi
+        
+        if [ -n "$adOptions" ]; then
+            db_get automation-interface-sso/ad_required_group
+            if [ -n "$RET" ]; then
+                 adOptions="$adOptions -G $RET"
+            fi
+
+            db_get automation-interface-sso/ad_userPrincipalName
+            if [ -n "$RET" ]; then
+                 adOptions="$adOptions -P"
+            fi
+
+            db_get automation-interface-sso/ou_users
+            if [ -n "$RET" ]; then
+                 adOptions="$adOptions -o $RET"
+            fi
+
+            db_get automation-interface-sso/ou_groups
+            if [ -n "$RET" ]; then
+                 adOptions="$adOptions -g $RET"
+            fi
+
+            /usr/bin/ad_conf_generator.sh $adOptions > /var/lib/containers/storage/volumes/sso/_data/identityProvider/ad_conf.py
+        fi
+
+        db_get automation-interface-sso/superadmin_AD_groups
+        if [ -n "$RET" ]; then
+            superadmin_AD_groups="$RET"
+            sed -i "s/^SUPERADMIN_IDENTITY_AD_GROUPS =.*/SUPERADMIN_IDENTITY_AD_GROUPS = [ \"$superadmin_AD_groups\" ]/" /var/lib/containers/storage/volumes/sso/_data/settings.py
+        fi
+
+        sed -i "s|^AUTH_LDAP_SERVER_URI =.*|AUTH_LDAP_SERVER_URI = \"\"|g" /var/lib/containers/storage/volumes/sso/_data/identityProvider/ldap_conf.py # unused here.
+
+        # Mark as configured.
+        touch /var/lib/containers/storage/volumes/sso/_data/configuration.performed
+    fi
+
+    printf "\n* Internal database configuration...\n"
+    if podman exec sso mysql -e "exit"; then
+        # User sso.
+        # Upon podman image creation, a password is generated for the user sso.
+        databaseUserPassword=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+
+        if [ "$(podman exec sso mysql --vertical -e "SELECT User FROM mysql.user WHERE User = 'sso';" | tail -1 | awk '{print $2}')" == "" ]; then
+            # User sso not present: create.
+            echo "Creating sso user..."
+            podman exec sso mysql -e "CREATE USER 'sso'@'localhost' IDENTIFIED BY '$databaseUserPassword';"
+            podman exec sso mysql -e "GRANT USAGE ON *.* TO 'sso'@'localhost' REQUIRE NONE WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;"
+            podman exec sso mysql -e 'GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, INDEX, ALTER, CREATE TEMPORARY TABLES, CREATE VIEW, SHOW VIEW, EXECUTE ON `sso`.* TO `sso`@`localhost`;'
+        else
+            # Update user's password.
+            echo "Updating sso user's password..."
+            podman exec sso mysql -e "SET PASSWORD FOR 'sso'@'localhost' = PASSWORD('$databaseUserPassword');"
+        fi
+
+        # Change database password into Django config file, too.
+        echo "Configuring Django..."
+        sed -i "s/^.*DATABASE_USER$/        'USER': 'sso', #DATABASE_USER/g" /var/lib/containers/storage/volumes/sso/_data/settings.py
+        sed -i "s/^.*DATABASE_PASSWORD$/        'PASSWORD': '$databaseUserPassword', #DATABASE_PASSWORD/g" /var/lib/containers/storage/volumes/sso/_data/settings.py
+
+        # Database sso.
+        echo "Creating database sso and restoring SQL dump..."
+        if [ "$(podman exec sso mysql --vertical -e "SHOW DATABASES LIKE 'sso';" | tail -1 | awk -F': ' '{print $2}')" == "" ]; then
+            podman exec sso mysql -e 'CREATE DATABASE sso DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;' # create database.
+            podman exec sso mysql sso -e "source /var/www/aaa/sso/sql/sso.sql" # restore database dump.
+
+            # Default admin user.
+            db_get automation-interface-sso/automation_interface_admin_password
+            if [ -n "$RET" ]; then
+                podman exec sso bash -c "cd /var/www/aaa; \
+                    source /var/lib/aaa-venv/bin/activate; \
+                    echo \"from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin@automation.local', 'admin@automation.local', '$RET')\" | python manage.py shell; \
+                    deactivate; \
+                    mv /var/www/aaa/manage.py /var/lib/aaa-venv/bin"
+            fi
+        fi
+
+        # Database update via diff.sql (migrations).
+        echo "Applying migrations..."
+        podman exec api-f5 bash /var/www/api/f5/sql/migrate.sh
+
+        # Activate mysql audit plugin.
+        podman exec sso bash -c "cp -p /usr/share/automation-interface-sso/51-mariadb.cnf /etc/mysql/mariadb.conf.d"
+    else
+        echo "Failed to access MariaDB RDBMS, auth_socket plugin must be enabled for the database root user. Quitting."
+        exit 1
+    fi
+
+    printf "\n* Restarting container's services..."
+    podman exec sso systemctl restart apache2
+    podman exec sso systemctl restart mariadb
+
+    printf "\n* Differences from package's stock config file and the installed one: please import NEW directives in your installed config file, if any.\n"
+    podman exec sso diff /var/www/aaa_default_settings.py /var/www/aaa/aaa/settings.py | grep '^[<>].*' | grep -v SECRET | grep -v PASSWORD || true
+
+    # syslog-ng seems going into a catatonic state while updating a package: restarting the whole thing.
+    if dpkg -l | grep automation-interface-log | grep -q ^ii; then
+        if systemctl list-unit-files | grep -q syslog-ng.service; then
+            systemctl restart syslog-ng || true # on host.
+            podman exec sso systemctl restart syslog-ng # on this container.
+        fi
+    fi
+
+    printf "\n* Cleanup...\n"
+    db_purge # cleanup debconf - used only for triggering user input, the standard way, here.
+fi
+
+exit 0
