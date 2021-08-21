@@ -115,7 +115,7 @@ function containerSetup()
     if rpm -qa | grep -q automation-interface-log; then
         if systemctl list-unit-files | grep -q syslog-ng.service; then
             systemctl restart syslog-ng || true # on host.
-            podman exec api-f5 systemctl restart syslog-ng # on this container.
+            podman exec sso systemctl restart syslog-ng # on this container.
         fi
     fi
 

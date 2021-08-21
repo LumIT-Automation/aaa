@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Migration scripts naming convenmtion: yyyy-mm-gg-name.sql.
+# Migration scripts naming convention: yyyy-mm-gg-name.sql.
 
 for f in /var/www/api/sso/sql/diff/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*.sql; do
     if [ -f "$f" ]; then

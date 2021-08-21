@@ -286,7 +286,7 @@ if [ "$1" == "configure" ]; then
 
         # Database update via diff.sql (migrations).
         echo "Applying migrations..."
-        podman exec api-f5 bash /var/www/api/f5/sql/migrate.sh
+        podman exec sso bash /var/www/aaa/sso/sql/migrate.sh
 
         # Activate mysql audit plugin.
         podman exec sso bash -c "cp -p /usr/share/automation-interface-sso/51-mariadb.cnf /etc/mysql/mariadb.conf.d"
