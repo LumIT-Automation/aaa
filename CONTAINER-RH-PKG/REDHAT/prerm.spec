@@ -11,7 +11,7 @@ fi
 if [ "$1" -eq "0" ]; then
     printf "\n* Cleanup...\n"
 
-    if podman ps | awk '{print $2}' | grep -q ^localhost/sso$; then
+    if podman ps | awk '{print $2}' | grep -Eq '\blocalhost/sso(:|\b)'; then
         podman stop sso
     fi
     
@@ -20,8 +20,8 @@ if [ "$1" -eq "0" ]; then
     fi
     
     # Be sure there is not rubbish around.
-    if podman ps --all | awk '{print $2}' | grep -q ^localhost/sso$; then
-        cIds=$( podman ps --all | awk '$2 == "localhost/sso" { print $1 }' )
+    if podman ps --all | awk '{print $2}' | grep -Eq '\blocalhost/sso(:|\b)'; then
+        cIds=$( podman ps --all | awk '$2 ~ /^localhost\/sso/ { print $1 }' )
         for id in $cIds; do
             podman rm -f $id
         done
