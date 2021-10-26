@@ -1,4 +1,5 @@
 FROM docker.io/amd64/debian:buster
+LABEL AUTOMATION_CONTAINER_IMAGE="api-sso"
 EXPOSE 80/tcp
 
 ADD PACKAGE /
