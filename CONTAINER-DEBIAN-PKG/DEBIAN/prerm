@@ -3,8 +3,9 @@
 printf "\n* Container prerm...\n"
 printf "\n* Cleanup...\n"
 
-if podman ps | awk '{print $2}' | grep -E '\blocalhost/sso(:|\b)'; then
-    podman stop sso
+if podman ps | awk '{print $2}' | grep -Eq '\blocalhost/sso(:|\b)'; then
+    podman stop -t 5 sso &
+    wait $! # Wait for the shutdown process of the container.
 fi
 
 if podman images | awk '{print $1}' | grep -q ^localhost/sso$; then
