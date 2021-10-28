@@ -9,7 +9,7 @@ fi
 printf "\n* Container preinst...\n"
 printf "\n* Cleanup...\n"
 
-# If this is an upgrade, stop the container in 5 seconds.
+# If there is an sso container already, stop it in 5 seconds.
 if podman ps | awk '{print $2}' | grep -Eq '\blocalhost/sso(:|\b)'; then
     podman stop -t 5 sso &
     wait $! # Wait for the shutdown process of the container.
