@@ -11,7 +11,7 @@ fi
 if [ "$1" -eq "0" ]; then
     printf "\n* Cleanup...\n"
 
-    if podman ps | awk '{print $2}' | grep -Eq '\blocalhost/sso(:|\b)'; then
+    if podman ps | awk '{print $2}' | grep -Eq '\blocalhost/sso(:|$)'; then
         podman stop -t 5 sso &
         wait $! # Wait for the shutdown process of the container.
     fi
@@ -21,8 +21,8 @@ if [ "$1" -eq "0" ]; then
     fi
 
     # Be sure there is not rubbish around.
-    if podman ps --all | awk '{print $2}' | grep -E '\blocalhost/sso(:|\b)'; then
-        cIds=$( podman ps --all | awk '$2 ~ /^localhost\/sso/ { print $1 }' )
+    if podman ps --all | awk '{print $2}' | grep -E '\blocalhost/sso(:|$)'; then
+        cIds=$( podman ps --all | awk '$2 ~ /^localhost\/sso(:|$)/ { print $1 }' )
         for id in $cIds; do
             podman rm -f $id
         done
