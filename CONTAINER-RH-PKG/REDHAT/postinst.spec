@@ -102,7 +102,7 @@ function containerSetup()
 
     diffOutput=$(podman exec sso diff /var/www/aaa_default_settings.py /var/www/aaa/aaa/settings.py | grep '^[<>].*' | grep -v SECRET | grep -v PASSWORD | grep -v VENV || true)
     if [ -n "$diffOutput" ]; then
-        printf "$wallBanner Differences from package's stock config file and the installed one: please import NEW directives in your installed config file, if any.\n* $diffOutput" | wall -n
+        printf "$wallBanner Differences from package's stock config file and the installed one (please import NEW directives in your installed config file, if any):\n* $diffOutput" | wall -n
     else
         radiusHelp="To enable radius authentication edit: /var/lib/containers/storage/volumes/sso/_data/aaa/identityProvider/radius_conf.py\n"
         adHelp="To enable ldap AD authentication edit: /var/lib/containers/storage/volumes/sso/_data/aaa/identityProvider/ad_conf.py\n"
