@@ -21,6 +21,9 @@ function containerSetup()
     wallBanner="RPM automation-interface-sso-container post-install configuration message:\n"
     cd /usr/lib/sso
 
+    # Grab the host timezone.
+    timeZone=$(timedatectl show| awk -F'=' '/Timezone/ {print $2}')
+
     # First container run: associate name, bind ports, bind fs volume, define init process, ...
     # sso folder will be bound to /var/lib/containers/storage/volumes/.
     podman run --name sso -v sso:/var/www/aaa/aaa -v sso-db:/var/lib/mysql -dt localhost/sso /sbin/init
@@ -39,6 +42,9 @@ function containerSetup()
     # Setup a Django secret key (per-installation): using host-bound folders.
     djangoSecretKey=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)
     sed -i "s|^SECRET_KEY =.*|SECRET_KEY = \"$djangoSecretKey\"|g" /var/lib/containers/storage/volumes/sso/_data/settings.py
+
+    printf "$wallBanner Set the timezone of the container to be the same as the host timezone..." | wall -n
+    podman exec sso bash -c "timedatectl set-timezone $timeZone"
 
     # Configure only if not already configured.
     if ! grep -Eq 'BEGIN RSA PRIVATE KEY' /var/lib/containers/storage/volumes/sso/_data/settings_jwt.py; then # container's file.

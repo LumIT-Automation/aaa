@@ -12,6 +12,9 @@ if [ "$1" == "configure" ]; then
     # Build container image.
     buildah bud -t sso .
 
+     # Grab the host timezone.
+    timeZone=$(timedatectl show| awk -F'=' '/Timezone/ {print $2}')
+
     # First container run: associate name, bind ports, bind fs volume, define init process, ...
     # sso folder will be bound to /var/lib/containers/storage/volumes/.
     # Until the package is not uninstalled+purged, fs volumes remain untouched -> newly installed package's configuration files are then rewritten with volume's ones (this is why some services are restarted).
@@ -31,6 +34,9 @@ if [ "$1" == "configure" ]; then
     # Setup a Django secret key (per-installation): using host-bound folders.
     djangoSecretKey=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)
     sed -i "s|^SECRET_KEY =.*|SECRET_KEY = \"$djangoSecretKey\"|g" /var/lib/containers/storage/volumes/sso/_data/settings.py
+
+    printf "\n Set the timezone of the container to be the same as the host timezone...\n"
+    podman exec sso bash -c "timedatectl set-timezone $timeZone"
 
     # Configure only if not already configured.
     if ! grep -Eq 'BEGIN RSA PRIVATE KEY' /var/lib/containers/storage/volumes/sso/_data/settings_jwt.py; then # container's file.
