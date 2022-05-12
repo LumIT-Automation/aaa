@@ -26,21 +26,21 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         if user.username: 
-            Log.log("Ask token for user " + user.username + "...")
+            Log.log("Ask token for user "+user.username + "...")
             # Auth system can be confused from users with and without the @domain part in the login string. If so, set the
             # AUTH_LDAP_USER_QUERY_FIELD parameter in settings.py https://django-auth-ldap.readthedocs.io/en/latest/reference.html
             Log.log("If this fails maybe you should delete the username "+str(user.username)+" from the auth_user table in the sso db.")
 
             token = super().get_token(user)
 
-            # Get the list of the groups this user belong to.
+            # Get the groups' list this user belongs to.
             # https://django-auth-ldap.readthedocs.io/en/latest/users.html#direct-attribute-access
             if hasattr(user, 'ldap_user'):
                 groups = []
                 for g in user.ldap_user.group_dns:
                     # Prevent "tampered" admin group.
                     if g != "automation.local":
-                        groups.append(g)
+                        groups.append(g.lower())
             else:
                 groups = []
 
@@ -50,15 +50,16 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
             # AD superadmin: add automation.local (the superadmin group) to the group list of the user.
             for g in settings.SUPERADMIN_IDENTITY_AD_GROUPS:
+                g = g.lower()
                 if g in groups:
                     groups.append("automation.local")
 
             # Add custom claims.
             token['username'] = user.username
-            token['uuid'] = str(token['user_id']) + hashlib.md5(str(settings.AUTHENTICATION_BACKENDS).encode('utf-8')).hexdigest()[0:5] # unique userid for this platform (trusting IP authority).
+            token['uuid'] = str(token['user_id'])+hashlib.md5(str(settings.AUTHENTICATION_BACKENDS).encode('utf-8')).hexdigest()[0:5] # unique userid for this platform (trusting IP authority).
             token['groups'] = groups
 
-            Log.log("Obtained token for user " + str(user.username) + ", uuid " + str(token['uuid']) + ", groups " + str(token["groups"]))
+            Log.log("Obtained token for user "+str(user.username)+", uuid "+str(token['uuid'])+", groups "+str(token["groups"]))
 
             return token
 
