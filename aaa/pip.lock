@@ -1,9 +1,9 @@
-asgiref==3.5.0
-certifi==2021.10.8
-cffi==1.15.0
+asgiref==3.5.2
+certifi==2022.6.15
+cffi==1.15.1
 chardet==4.0.0
 cryptography==3.4.8
-Django==3.2.13
+Django==3.2.14
 django-auth-ldap==2.4.0
 django-radius==1.5.0
 djangorestframework==3.12.4
@@ -23,5 +23,5 @@ pytz==2022.1
 requests==2.25.1
 six==1.16.0
 sqlparse==0.4.2
-typing_extensions==4.1.1
+typing_extensions==4.3.0
 urllib3==1.26.9
