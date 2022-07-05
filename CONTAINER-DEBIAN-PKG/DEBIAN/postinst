@@ -19,11 +19,15 @@ if [ "$1" == "configure" ]; then
     # sso folder will be bound to /var/lib/containers/storage/volumes/.
     # Until the package is not uninstalled+purged, fs volumes remain untouched -> newly installed package's configuration files are then rewritten with volume's ones (this is why some services are restarted).
     # Side effect is that new package's configuration directives are ignored, so the user must be informed ("Differences from stock config").
-    podman run --name sso -v sso:/var/www/aaa/aaa -v sso-db:/var/lib/mysql -dt localhost/sso /sbin/init
+    podman run --name sso -v sso:/var/www/aaa/aaa -v sso-db:/var/lib/mysql -v sso-cacerts:/usr/local/share/ca-certificates -dt localhost/sso /sbin/init
     podman exec sso chown www-data:www-data /var/www/aaa/aaa
 
     podman exec sso chown mysql:mysql /var/lib/mysql # within container.
     podman exec sso systemctl restart mysql
+
+    podman exec sso chown 0:0 /usr/local/share/ca-certificates/*
+    podman exec sso chmod 644 /usr/local/share/ca-certificates/*
+    podman exec sso update-ca-certificates
 
     printf "\n* Starting Container Service on HOST...\n"
     systemctl daemon-reload
