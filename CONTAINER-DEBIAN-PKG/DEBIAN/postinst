@@ -25,8 +25,9 @@ if [ "$1" == "configure" ]; then
     podman exec sso chown mysql:mysql /var/lib/mysql # within container.
     podman exec sso systemctl restart mysql
 
-    podman exec sso find /usr/local/share/ca-certificates -type f -exec chown 0:0 {} \; -exec chmod 644 {} \;
-    podman exec sso update-ca-certificates'
+    podman exec sso find /usr/local/share/ca-certificates -type f -exec chown 0:0 {} \;
+    podman exec sso find /usr/local/share/ca-certificates -type f -exec chmod 644 {} \;
+    podman exec sso update-ca-certificates
 
     printf "\n* Starting Container Service on HOST...\n"
     systemctl daemon-reload

@@ -13,6 +13,7 @@ if [ "$1" == "purge" ]; then
         printf "\n* Clean up sso volume...\n"
         podman volume rm -f sso
         podman volume rm -f sso-db
+        podman volume rm -f sso-cacerts
     fi
 fi
 
