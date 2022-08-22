@@ -3,7 +3,7 @@ certifi==2022.6.15
 cffi==1.15.1
 chardet==4.0.0
 cryptography==3.4.8
-Django==3.2.14
+Django==3.2.15
 django-auth-ldap==2.4.0
 django-radius==1.5.0
 djangorestframework==3.12.4
@@ -18,10 +18,10 @@ pyasn1-modules==0.2.8
 pycparser==2.21
 PyJWT==2.0.1
 pyrad==2.4
-python-ldap==3.4.0
-pytz==2022.1
+python-ldap==3.4.2
+pytz==2022.2.1
 requests==2.25.1
 six==1.16.0
 sqlparse==0.4.2
 typing_extensions==4.3.0
-urllib3==1.26.9
+urllib3==1.26.11

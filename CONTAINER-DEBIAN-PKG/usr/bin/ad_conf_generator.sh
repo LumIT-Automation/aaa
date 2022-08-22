@@ -92,6 +92,11 @@ $includeDjangoAuthLdap
 AUTH_LDAP_SERVER_URI = \"$ldapUrl\"
 
 # SETTINGS.
+AUTH_LDAP_CONNECTION_OPTIONS = {
+    ldap.OPT_DEBUG_LEVEL: 1,
+    ldap.OPT_NETWORK_TIMEOUT: 10,
+    ldap.OPT_TIMEOUT: 10,
+}
 
 AUTH_LDAP_BIND_DN = \"CN=${connectUser},${usersSearchString}\"
 AUTH_LDAP_BIND_PASSWORD = \"${connectUserPwd}\"

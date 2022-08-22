@@ -7,6 +7,11 @@ from django_auth_ldap.config import LDAPSearch, LDAPGroupQuery, LDAPGroupType, G
 AUTH_LDAP_SERVER_URI = "ldap://10.0.111.111:389"
 
 # SETTINGS.
+AUTH_LDAP_CONNECTION_OPTIONS = {
+    ldap.OPT_DEBUG_LEVEL: 1,
+    ldap.OPT_NETWORK_TIMEOUT: 10,
+    ldap.OPT_TIMEOUT: 10,
+}
 
 AUTH_LDAP_BIND_DN = "CN=admin,DC=lab,DC=local"
 AUTH_LDAP_BIND_PASSWORD = "password"
