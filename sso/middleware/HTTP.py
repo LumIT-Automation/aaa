@@ -14,6 +14,7 @@ class HTTPMiddleware:
         # Add headers (CORS).
         if settings.DEBUG:
             response['Access-Control-Allow-Origin'] = "*"
+            response['Access-Control-Allow-Methods'] = "OPTIONS, GET, POST, PATCH, PUT, DELETE"
             response['Access-Control-Allow-Headers'] = "Authorization, Content-Type"
 
         return response
