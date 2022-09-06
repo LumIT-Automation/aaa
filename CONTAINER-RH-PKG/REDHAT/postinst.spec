@@ -26,7 +26,7 @@ function containerSetup()
 
     # First container run: associate name, bind ports, bind fs volume, define init process, ...
     # sso folder will be bound to /var/lib/containers/storage/volumes/.
-    podman run --name sso -v sso:/var/www/aaa/aaa -v sso-db:/var/lib/mysql -dt localhost/sso /sbin/init
+    podman run --name sso -v sso:/var/www/aaa/aaa -v sso-db:/var/lib/mysql -v sso-cacerts:/usr/local/share/ca-certificates -dt localhost/sso /sbin/init
     podman exec sso chown www-data:www-data /var/www/aaa/aaa
 
     podman exec sso chown mysql:mysql /var/lib/mysql # within container.

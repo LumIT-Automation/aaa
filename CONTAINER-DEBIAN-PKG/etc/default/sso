@@ -1,0 +1,6 @@
+# Days of Retention for sso databases backup
+SSO_DB_RETENTION=30
+
+# Days of Retention for sso volumes backup
+SSO_VOL_RETENTION=120
+

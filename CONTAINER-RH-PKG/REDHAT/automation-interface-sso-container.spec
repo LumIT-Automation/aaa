@@ -6,7 +6,7 @@ Summary:    Automation Interface Single Sign On, container image
 License:    GPLv3+
 Source0:    RPM_SOURCE
 
-Requires:   podman, buildah, at
+Requires:   podman, buildah, at, cronie
 Requires:   automation-interface-log >= 1.2
 
 BuildArch:  x86_64

@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Backup script for data volumes of the sso container.
+# Should be placed in /etc/cron.weekly
+
+PATH=/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+
+[ -r /etc/default/sso ] && . /etc/default/sso
+
+now=`date +%Y%m%d-%H.%M`
+api="sso"
+
+# Name of the container volumes that should be backed up.
+vols=(sso sso-cacerts)
+
+bckDir="/home/bck/${api}/volumes"
+containerVolDir="/var/lib/containers/storage/volumes"
+
+# Number of days of retention: delete backups older than this number of days.
+if echo $SSO_VOL_RETENTION | grep -Eq '^[0-9]+$'; then
+    retention=$SSO_VOL_RETENTION
+else
+    retention=120
+fi
+
+
+cd $containerVolDir || exit 1
+
+for vol in ${vols[@]}; do
+    bckFile="${vol}_${now}.tar.xz"
+
+    tar cfJp ${bckDir}/$bckFile $vol && chmod 400 ${bckDir}/${bckFile}
+done
+
+# The backup script should run once a week.
+# Delete backups older than $retention days.
+for vol in $vols; do
+    find $bckDir -name "${vol}_*" -mtime +${retention} -exec rm -f {} \;
+done
+
