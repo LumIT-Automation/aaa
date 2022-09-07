@@ -6,7 +6,7 @@
 PATH=/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin
 
 # Grab some settings.
-[ -r /etc/default/sso ] && . /etc/default/sso
+[ -r /etc/default/sso-container ] && . /etc/default/sso-container
 
 now=`date +%Y%m%d-%H.%M`
 api="sso"
@@ -28,7 +28,6 @@ fi
 
 cd $bckDir || exit 1
 
-echo $dbs
 for db in ${dbs[@]}; do
     bckFile="${db}_${api}_${now}.dmp.xz"
     bckCommand="mysqldump --single-transaction --routines --events --add-drop-database --add-drop-table --add-drop-trigger --databases $db"
