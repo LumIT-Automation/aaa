@@ -1,5 +1,5 @@
 asgiref==3.5.2
-certifi==2022.9.14
+certifi==2022.9.24
 cffi==1.15.1
 chardet==4.0.0
 cryptography==3.4.8
@@ -22,6 +22,6 @@ python-ldap==3.4.3
 pytz==2022.2.1
 requests==2.25.1
 six==1.16.0
-sqlparse==0.4.2
+sqlparse==0.4.3
 typing_extensions==4.3.0
 urllib3==1.26.12

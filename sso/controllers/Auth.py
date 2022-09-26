@@ -29,7 +29,8 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
             Log.log("Ask token for user "+user.username + "...")
             # Auth system can be confused from users with and without the @domain part in the login string. If so, set the
             # AUTH_LDAP_USER_QUERY_FIELD parameter in settings.py https://django-auth-ldap.readthedocs.io/en/latest/reference.html
-            Log.log("If this fails maybe you should delete the username "+str(user.username)+" from the auth_user table in the sso db.")
+            if not user.username.endswith('@automation.local'):
+                Log.log("If this fails maybe you should delete the username "+str(user.username)+" from the auth_user table in the sso db.")
 
             token = super().get_token(user)
 
