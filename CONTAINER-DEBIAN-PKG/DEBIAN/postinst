@@ -19,9 +19,9 @@ if [ "$1" == "configure" ]; then
     # sso folder will be bound to /var/lib/containers/storage/volumes/.
     # Until the package is not uninstalled+purged, fs volumes remain untouched -> newly installed package's configuration files are then rewritten with volume's ones (this is why some services are restarted).
     # Side effect is that new package's configuration directives are ignored, so the user must be informed ("Differences from stock config").
-    podman run --name sso -v sso:/var/www/aaa/aaa -v sso-db:/var/lib/mysql -v sso-cacerts:/usr/local/share/ca-certificates -dt localhost/sso /sbin/init
-    podman exec sso chown www-data:www-data /var/www/aaa/aaa
+    podman run --name sso -v sso:/var/www/aaa/aaa -v sso-db:/var/lib/mysql -v sso-cacerts:/usr/local/share/ca-certificates -dt localhost/sso /lib/systemd/systemd
 
+    podman exec sso chown www-data:www-data /var/www/aaa/aaa
     podman exec sso chown mysql:mysql /var/lib/mysql # within container.
     podman exec sso systemctl restart mysql
 
@@ -297,9 +297,6 @@ if [ "$1" == "configure" ]; then
         # Database update via diff.sql (migrations).
         echo "Applying migrations..."
         podman exec sso bash /var/www/aaa/sso/sql/migrate.sh
-
-        # Activate mysql audit plugin.
-        podman exec sso bash -c "cp -p /usr/share/automation-interface-sso/51-mariadb.cnf /etc/mysql/mariadb.conf.d"
     else
         echo "Failed to access MariaDB RDBMS, auth_socket plugin must be enabled for the database root user. Quitting."
         exit 1
