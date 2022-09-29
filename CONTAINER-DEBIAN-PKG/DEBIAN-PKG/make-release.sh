@@ -132,10 +132,12 @@ function System_codeConfig()
 
     # The following settings are emptied here and filled-in by postinst/s (debconf).
     sed -i "s/^SECRET_KEY =.*/SECRET_KEY = \"1234567890\"/g" $workingFolderPath/var/www/aaa/aaa/settings.py
-    sed -i "s/^ALLOWED_HOSTS =.*/ALLOWED_HOSTS = \"['*']\"/g" $workingFolderPath/var/www/aaa/aaa/settings.py
+    sed -i "s/^ALLOWED_HOSTS =.*/ALLOWED_HOSTS = ['*']/g" $workingFolderPath/var/www/aaa/aaa/settings.py
 
     sed -i -e ':a;N;$!ba;s|"publicKey.*,|"publicKey": '\'\'\'\'\'\','|g' $workingFolderPath/var/www/aaa/aaa/settings_jwt.py
     sed -i -e ':a;N;$!ba;s|"privateKey.*}|"privateKey": '\'\'\'\'\'\''\n}|g' $workingFolderPath/var/www/aaa/aaa/settings_jwt.py
+
+    sed -i "s/^WORKFLOW_SECRET =.*/WORKFLOW_SECRET = \"\"/g" $workingFolderPath/var/www/aaa/aaa/settings_workflow.py
 
     sed -i "s/^RADIUS_SERVER =.*/RADIUS_SERVER = \"\"/g" $workingFolderPath/var/www/aaa/aaa/identityProvider/radius_conf.py
     sed -i "s/^RADIUS_PORT =.*/RADIUS_PORT = 0/g" $workingFolderPath/var/www/aaa/aaa/identityProvider/radius_conf.py
