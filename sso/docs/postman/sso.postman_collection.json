@@ -99,6 +99,46 @@
 			"response": []
 		},
 		{
+			"name": "Token (workflow system user)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"workflow@automation.local\",\n    \"password\": \"password\" \n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://10.0.111.100/api/v1/token/",
+					"protocol": "http",
+					"host": [
+						"10",
+						"0",
+						"111",
+						"100"
+					],
+					"path": [
+						"api",
+						"v1",
+						"token",
+						""
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Token (radius)",
 			"request": {
 				"method": "POST",
