@@ -13,11 +13,9 @@ fi
 
 
 podman exec sso bash -c "cd /var/www/aaa; \
-mv /var/lib/aaa-venv/bin/manage.py .; \
 source /var/lib/aaa-venv/bin/activate; \
 echo \"from django.contrib.auth.models import User; usr = User.objects.get(username='admin@automation.local'); usr.set_password('$passwd1'); usr.save()\" | python manage.py shell; \
-deactivate; \
-mv manage.py /var/lib/aaa-venv/bin;"
+deactivate"
 
 if [ $? -eq 0 ]; then
     echo "Password changed"

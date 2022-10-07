@@ -26,7 +26,7 @@ function containerSetup()
 
     # First container run: associate name, bind ports, bind fs volume, define init process, ...
     # sso folder will be bound to /var/lib/containers/storage/volumes/.
-    podman run --name sso -v sso:/var/www/aaa/aaa -v sso-db:/var/lib/mysql -v sso-cacerts:/usr/local/share/ca-certificates -dt localhost/sso /sbin/init
+    podman run --name sso -v sso:/var/www/aaa/aaa -v sso-db:/var/lib/mysql -v sso-cacerts:/usr/local/share/ca-certificates -dt localhost/sso /lib/systemd/systemd
     podman exec sso chown www-data:www-data /var/www/aaa/aaa
 
     podman exec sso chown mysql:mysql /var/lib/mysql # within container.
@@ -94,9 +94,10 @@ function containerSetup()
 
             echo '\n* Default admin password is \"password\"\n'
         fi
-        
-        # Activate mysql audit plugin.
-        podman exec sso bash -c "cp -p /usr/share/automation-interface-sso/51-mariadb.cnf /etc/mysql/mariadb.conf.d"
+
+        # Database update via diff.sql (migrations).
+        echo "Applying migrations..."
+        podman exec sso bash /var/www/aaa/sso/sql/migrate.sh
     else
         echo "Failed to access MariaDB RDBMS, auth_socket plugin must be enabled for the database root user. Quitting."
         exit 1

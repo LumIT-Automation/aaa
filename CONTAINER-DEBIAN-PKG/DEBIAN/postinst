@@ -19,9 +19,9 @@ if [ "$1" == "configure" ]; then
     # sso folder will be bound to /var/lib/containers/storage/volumes/.
     # Until the package is not uninstalled+purged, fs volumes remain untouched -> newly installed package's configuration files are then rewritten with volume's ones (this is why some services are restarted).
     # Side effect is that new package's configuration directives are ignored, so the user must be informed ("Differences from stock config").
-    podman run --name sso -v sso:/var/www/aaa/aaa -v sso-db:/var/lib/mysql -v sso-cacerts:/usr/local/share/ca-certificates -dt localhost/sso /sbin/init
-    podman exec sso chown www-data:www-data /var/www/aaa/aaa
+    podman run --name sso -v sso:/var/www/aaa/aaa -v sso-db:/var/lib/mysql -v sso-cacerts:/usr/local/share/ca-certificates -dt localhost/sso /lib/systemd/systemd
 
+    podman exec sso chown www-data:www-data /var/www/aaa/aaa
     podman exec sso chown mysql:mysql /var/lib/mysql # within container.
     podman exec sso systemctl restart mysql
 
@@ -289,17 +289,24 @@ if [ "$1" == "configure" ]; then
                 podman exec sso bash -c "cd /var/www/aaa; \
                     source /var/lib/aaa-venv/bin/activate; \
                     echo \"from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin@automation.local', 'admin@automation.local', '$RET')\" | python manage.py shell; \
-                    deactivate; \
-                    mv /var/www/aaa/manage.py /var/lib/aaa-venv/bin"
+                    deactivate"
+            fi
+
+            # Configure only if not already configured.
+            if ! cat /var/lib/containers/storage/volumes/sso/_data/settings_workflow.py | awk -F'=' '/WORKFLOW_SECRET/ {print $2}' | sed 's/[ "]//g' | grep -Eq '[[:alnum:]]'; then
+                workflowSecretKey=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)
+                echo "WORKFLOW_SECRET = \"$workflowSecretKey\"" > /var/lib/containers/storage/volumes/sso/_data/settings_workflow.py # in order to be shared.
+
+                podman exec sso bash -c "cd /var/www/aaa; \
+                    source /var/lib/aaa-venv/bin/activate; \
+                    echo \"from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('workflow@automation.local', 'workflow@automation.local', '$workflowSecretKey')\" | python manage.py shell; \
+                    deactivate"
             fi
         fi
 
         # Database update via diff.sql (migrations).
         echo "Applying migrations..."
         podman exec sso bash /var/www/aaa/sso/sql/migrate.sh
-
-        # Activate mysql audit plugin.
-        podman exec sso bash -c "cp -p /usr/share/automation-interface-sso/51-mariadb.cnf /etc/mysql/mariadb.conf.d"
     else
         echo "Failed to access MariaDB RDBMS, auth_socket plugin must be enabled for the database root user. Quitting."
         exit 1
