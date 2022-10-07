@@ -27,10 +27,14 @@ function containerSetup()
     # First container run: associate name, bind ports, bind fs volume, define init process, ...
     # sso folder will be bound to /var/lib/containers/storage/volumes/.
     podman run --name sso -v sso:/var/www/aaa/aaa -v sso-db:/var/lib/mysql -v sso-cacerts:/usr/local/share/ca-certificates -dt localhost/sso /lib/systemd/systemd
-    podman exec sso chown www-data:www-data /var/www/aaa/aaa
+    podman exec sso chown -R www-data:www-data /var/www/aaa/aaa
 
-    podman exec sso chown mysql:mysql /var/lib/mysql # within container.
+    podman exec sso chown -R mysql:mysql /var/lib/mysql # within container.
     podman exec sso systemctl restart mysql
+
+    podman exec sso find /usr/local/share/ca-certificates -type f -exec chown 0:0 {} \;
+    podman exec sso find /usr/local/share/ca-certificates -type f -exec chmod 644 {} \;
+    podman exec sso update-ca-certificates
 
     printf "$wallBanner Starting Container Service on HOST..." | wall -n # (upon installation, container is already run).
     systemctl daemon-reload
@@ -53,6 +57,7 @@ function containerSetup()
         podman exec sso jwtkey-generate.sh
         podman exec sso chown www-data:www-data /var/www/aaa/aaa/settings_jwt.py
         podman exec sso chmod 400 /var/www/aaa/aaa/settings_jwt.py
+        podman exec sso chmod 400 /var/www/aaa/aaa/settings_workflow.py
     fi
 
     printf "$wallBanner Internal database configuration..." | wall -n
@@ -88,12 +93,20 @@ function containerSetup()
             adminPwd='password'
             podman exec sso bash -c "cd /var/www/aaa; \
                 source /var/lib/aaa-venv/bin/activate; \
-                echo \"from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin@automation.local', 'admin@automation.local', '$adminPwd')\" | python manage.py shell; \
-                deactivate; \
-                mv /var/www/aaa/manage.py /var/lib/aaa-venv/bin"
+                echo \"from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin@automation.local', 'admin@automation.local', '$RET')\" | python manage.py shell; \
+                deactivate"
+            fi
 
-            echo '\n* Default admin password is \"password\"\n'
-        fi
+            # Configure only if not already configured.
+            if ! cat /var/lib/containers/storage/volumes/sso/_data/settings_workflow.py | awk -F'=' '/WORKFLOW_SECRET/ {print $2}' | sed 's/[ "]//g' | grep -Eq '[[:alnum:]]'; then
+                workflowSecretKey=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)
+                echo "WORKFLOW_SECRET = \"$workflowSecretKey\"" > /var/lib/containers/storage/volumes/sso/_data/settings_workflow.py # in order to be shared.
+
+                podman exec sso bash -c "cd /var/www/aaa; \
+                    source /var/lib/aaa-venv/bin/activate; \
+                    echo \"from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('workflow@automation.local', 'workflow@automation.local', '$workflowSecretKey')\" | python manage.py shell; \
+                    deactivate"
+            fi
 
         # Database update via diff.sql (migrations).
         echo "Applying migrations..."
