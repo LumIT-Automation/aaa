@@ -292,17 +292,17 @@ if [ "$1" == "configure" ]; then
                     echo \"from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin@automation.local', 'admin@automation.local', '$RET')\" | python manage.py shell; \
                     deactivate"
             fi
+        fi
 
-            # Configure only if not already configured.
-            if ! cat /var/lib/containers/storage/volumes/sso/_data/settings_workflow.py | awk -F'=' '/WORKFLOW_SECRET/ {print $2}' | sed 's/[ "]//g' | grep -Eq '[[:alnum:]]'; then
-                workflowSecretKey=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)
-                echo "WORKFLOW_SECRET = \"$workflowSecretKey\"" > /var/lib/containers/storage/volumes/sso/_data/settings_workflow.py # in order to be shared.
+        # Configure only if not already configured.
+        if ! cat /var/lib/containers/storage/volumes/sso/_data/settings_workflow.py | awk -F'=' '/WORKFLOW_SECRET/ {print $2}' | sed 's/[ "]//g' | grep -Eq '[[:alnum:]]'; then
+            workflowSecretKey=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)
+            echo "WORKFLOW_SECRET = \"$workflowSecretKey\"" > /var/lib/containers/storage/volumes/sso/_data/settings_workflow.py # in order to be shared.
 
-                podman exec sso bash -c "cd /var/www/aaa; \
-                    source /var/lib/aaa-venv/bin/activate; \
-                    echo \"from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('workflow@automation.local', 'workflow@automation.local', '$workflowSecretKey')\" | python manage.py shell; \
-                    deactivate"
-            fi
+            podman exec sso bash -c "cd /var/www/aaa; \
+                source /var/lib/aaa-venv/bin/activate; \
+                echo \"from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('workflow@automation.local', 'workflow@automation.local', '$workflowSecretKey')\" | python manage.py shell; \
+                deactivate"
         fi
 
         # Database update via diff.sql (migrations).
