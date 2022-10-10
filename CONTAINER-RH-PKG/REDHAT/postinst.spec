@@ -57,7 +57,6 @@ function containerSetup()
         podman exec sso jwtkey-generate.sh
         podman exec sso chown www-data:www-data /var/www/aaa/aaa/settings_jwt.py
         podman exec sso chmod 400 /var/www/aaa/aaa/settings_jwt.py
-        podman exec sso chmod 400 /var/www/aaa/aaa/settings_workflow.py
     fi
 
     printf "$wallBanner Internal database configuration..." | wall -n
@@ -101,6 +100,8 @@ function containerSetup()
         if ! cat /var/lib/containers/storage/volumes/sso/_data/settings_workflow.py | awk -F'=' '/WORKFLOW_SECRET/ {print $2}' | sed 's/[ "]//g' | grep -Eq '[[:alnum:]]'; then
             workflowSecretKey=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)
             echo "WORKFLOW_SECRET = \"$workflowSecretKey\"" > /var/lib/containers/storage/volumes/sso/_data/settings_workflow.py # in order to be shared.
+            podman exec sso chown www-data:www-data /var/www/aaa/aaa/settings_workflow.py
+            podman exec sso chmod 400 /var/www/aaa/aaa/settings_workflow.py
 
             podman exec sso bash -c "cd /var/www/aaa; \
                 source /var/lib/aaa-venv/bin/activate; \
