@@ -99,7 +99,8 @@ function containerSetup()
         # Configure only if not already configured.
         if ! cat /var/lib/containers/storage/volumes/sso/_data/settings_workflow.py | awk -F'=' '/WORKFLOW_SECRET/ {print $2}' | sed 's/[ "]//g' | grep -Eq '[[:alnum:]]'; then
             workflowSecretKey=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)
-            echo "WORKFLOW_SECRET = \"$workflowSecretKey\"" > /var/lib/containers/storage/volumes/sso/_data/settings_workflow.py # in order to be shared.
+            echo "WORKFLOW_USER = \"workflow@automation.local\"" > /var/lib/containers/storage/volumes/sso/_data/settings_workflow.py
+            echo "WORKFLOW_SECRET = \"$workflowSecretKey\"" >> /var/lib/containers/storage/volumes/sso/_data/settings_workflow.py # in order to be shared.
             podman exec sso chown www-data:www-data /var/www/aaa/aaa/settings_workflow.py
             podman exec sso chmod 400 /var/www/aaa/aaa/settings_workflow.py
 
