@@ -162,17 +162,18 @@ LOGGING = {
     },
 
     'loggers': {
-        '': {
+        'django': {
             'handlers': ['syslog_django'],
             'level': 'DEBUG',
-            'propagate': True
-        },
-        'django': {
-            'handlers': [ 'syslog_django' ],
-            'level': 'DEBUG',
+            'propagate': False
         },
         'http': {
-            'handlers': [ 'syslog_http' ],
+            'handlers': ['syslog_http'],
+            'level': 'DEBUG',
+            'propagate': False
+        },
+        '': {
+            'handlers': ['syslog_django'],
             'level': 'DEBUG',
         },
     },
