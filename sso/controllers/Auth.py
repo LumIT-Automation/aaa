@@ -61,7 +61,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
             # Add custom claims.
             token['username'] = user.username
-            token['uuid'] = str(token['user_id'])+hashlib.md5(str(settings.AUTHENTICATION_BACKENDS).encode('utf-8')).hexdigest()[0:5] # unique userid for this platform (trusting IP authority).
+            token['uuid'] = str(token['user_id'])+hashlib.sha256(str(settings.AUTHENTICATION_BACKENDS).encode('utf-8')).hexdigest()[0:5] # unique userid for this platform (trusting IP authority).
             token['groups'] = groups
 
             Log.log("Obtained token for user "+str(user.username)+", uuid "+str(token['uuid'])+", groups "+str(token["groups"]))
