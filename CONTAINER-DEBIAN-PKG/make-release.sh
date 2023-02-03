@@ -146,8 +146,8 @@ function System_systemFilesSetup()
     chmod +x $workingFolderPath/etc/cron.daily/bck-db_${shortName}
     chmod +x $workingFolderPath/usr/bin/${shortName}-container.sh
     chmod +x $workingFolderPath/usr/lib/${shortName}/bootstrap.sh
-    chmod +x $workingFolderPath/usr/bin/sso-reset-admin-password.sh
     chmod +x $workingFolderPath/usr/bin/ad_conf_generator.sh
+    chmod 744 $workingFolderPath/usr/bin/sso-reset-admin-password.sh
     chmod 700 $workingFolderPath/home/bck/${shortName}/volumes
     chmod 700 $workingFolderPath/home/bck/${shortName}
 }

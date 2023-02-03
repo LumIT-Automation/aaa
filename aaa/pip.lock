@@ -3,7 +3,7 @@ certifi==2022.12.7
 cffi==1.15.1
 charset-normalizer==3.0.1
 cryptography==38.0.4
-Django==4.1.5
+Django==4.1.6
 django-auth-ldap==4.1.0
 django-radius==1.5.0
 djangorestframework==3.14.0
