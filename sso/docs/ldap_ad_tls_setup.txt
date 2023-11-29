@@ -1,0 +1,37 @@
+##############################################################
+# Server with self-signed certificate (eg: samba AD) example:
+##############################################################
+
+AUTH_LDAP_SERVER_URI = "ldap://xxx.xxx.xxx.xxx:389"
+AUTH_LDAP_START_TLS = True
+
+# SETTINGS.
+AUTH_LDAP_CONNECTION_OPTIONS = {
+    ldap.OPT_DEBUG_LEVEL: 1,
+    ldap.OPT_NETWORK_TIMEOUT: 10,
+    ldap.OPT_TIMEOUT: 10,
+    ldap.OPT_X_TLS_REQUIRE_CERT: ldap.OPT_X_TLS_NEVER
+}
+
+
+##############################################################
+# Server with ca-signed certificate example:
+##############################################################
+
+AUTH_LDAP_SERVER_URI = "ldap://xxx.xxx.xxx.xxx:389"
+AUTH_LDAP_START_TLS = True
+LDAP_CACERT_FILE_PATH = "/usr/local/share/ca-certificates/ca.crt"
+
+# SETTINGS.
+AUTH_LDAP_CONNECTION_OPTIONS = {
+    ldap.OPT_DEBUG_LEVEL: 1,
+    ldap.OPT_NETWORK_TIMEOUT: 10,
+    ldap.OPT_TIMEOUT: 10,
+    ldap.OPT_X_TLS_CACERTFILE: LDAP_CACERT_FILE_PATH,
+    ldap.OPT_X_TLS_REQUIRE_CERT: ldap.OPT_X_TLS_ALLOW,
+    ldap.OPT_X_TLS_NEWCTX: 0
+
+}
+# Client certificate options (in AUTH_LDAP_CONNECTION_OPTIONS):
+# ldap.OPT_X_TLS_CERTFILE =  
+# ldap.OPT_X_TLS_KEYFILE =
