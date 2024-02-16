@@ -85,7 +85,9 @@ function containerSetup()
         # Database sso.
         echo "Creating database sso and restoring SQL dump..."
         if [ "$(podman exec sso mysql --vertical -e "SHOW DATABASES LIKE 'sso';" | tail -1 | awk -F': ' '{print $2}')" == "" ]; then
-            podman exec sso mysql -e 'CREATE DATABASE sso DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;' # create database.
+            pkgVer=`dpkg-query --show --showformat='${Version}' automation-interface-sso-container`
+            commit=$(podman exec sso dpkg-query --show --showformat='${Description}' automation-interface-sso | sed -r -e 's/.*commit: (.*)/\1/' -e 's/\)\.//')
+            podman exec sso mysql -e 'CREATE DATABASE `sso` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT ='"'"'pkgVersion='${pkgVer}' commit='${commit}"'"';'
             podman exec sso mysql sso -e "source /var/www/aaa/sso/sql/sso.sql" # restore database dump.
 
             # Default admin user.
