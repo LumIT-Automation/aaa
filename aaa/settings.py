@@ -180,10 +180,9 @@ LOGGING = {
 }
 
 # Django REST Framework.
-
+# 'radiusauth.backends.RADIUSBackend',   # Disables, wait for an upgrade from upstream.
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'radiusauth.backends.RADIUSBackend',
     "django_auth_ldap.backend.LDAPBackend",
 ]
 
