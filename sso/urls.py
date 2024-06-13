@@ -3,6 +3,7 @@ from django.urls import path
 from .controllers import Root
 from .controllers import Auth
 from .controllers import Superadmins
+from .controllers import RawTxtController
 
 
 urlpatterns = [
@@ -13,4 +14,6 @@ urlpatterns = [
     path('api/v1/token/refresh/', Auth.MyTokenObtainPairView.as_view(), name='token-refresh'),
 
     path('api/v1/superadmins/', Superadmins.SuperadminsController.as_view(), name='superadmins'),
+
+    path('api/v1/doc/<str:fileName>/', RawTxtController.SsoRawTxtController.as_view(), name='txt'),
 ]

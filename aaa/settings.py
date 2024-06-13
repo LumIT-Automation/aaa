@@ -234,3 +234,5 @@ SIMPLE_JWT = {
 }
 
 SUPERADMIN_IDENTITY_AD_GROUPS = ["cn=groupGods,cn=users,dc=lab,dc=local"]
+
+DOC_TXT_DIR = "/var/www/aaa/doc/"
