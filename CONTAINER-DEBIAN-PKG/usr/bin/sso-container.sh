@@ -5,7 +5,7 @@ function start() {
 }
 
 function stop() {
-    podman stop sso
+    podman stop -t 15 sso
 }
 
 function restart() {
