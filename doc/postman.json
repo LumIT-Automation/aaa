@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "58c3ad92-a03f-4e8d-81ed-d114a77173cb",
+		"_postman_id": "7205fcc6-05b8-455e-b6cd-66f2839d21b3",
 		"name": "sso",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -71,30 +71,6 @@
 						"{{ssoBaseUrl}}"
 					],
 					"path": [
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "superadmins",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{jtwtoken}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{ssoBaseUrl}}/superadmins/",
-					"host": [
-						"{{ssoBaseUrl}}"
-					],
-					"path": [
-						"superadmins",
 						""
 					]
 				}
