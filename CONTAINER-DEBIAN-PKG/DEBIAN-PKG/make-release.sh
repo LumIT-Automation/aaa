@@ -139,8 +139,6 @@ function System_codeConfig()
     sed -i -e ':a;N;$!ba;s|"publicKey.*,|"publicKey": '\'\'\'\'\'\','|g' $workingFolderPath/var/www/aaa/aaa/settings_jwt.py
     sed -i -e ':a;N;$!ba;s|"privateKey.*}|"privateKey": '\'\'\'\'\'\''\n}|g' $workingFolderPath/var/www/aaa/aaa/settings_jwt.py
 
-    sed -i "s/^WORKFLOW_SECRET =.*/WORKFLOW_SECRET = \"\"/g" $workingFolderPath/var/www/aaa/aaa/settings_workflow.py
-
     sed -i "s/^RADIUS_SERVER =.*/RADIUS_SERVER = \"\"/g" $workingFolderPath/var/www/aaa/aaa/identityProvider/radius_conf.py
     sed -i "s/^RADIUS_PORT =.*/RADIUS_PORT = 0/g" $workingFolderPath/var/www/aaa/aaa/identityProvider/radius_conf.py
     sed -i "s/^RADIUS_SECRET =.*/RADIUS_SECRET = \"\"/g" $workingFolderPath/var/www/aaa/aaa/identityProvider/radius_conf.py

@@ -3,7 +3,6 @@ from datetime import timedelta
 
 # JWT settings.
 from aaa.settings_jwt import *
-from aaa.settings_workflow import *
 
 # Identity provider.
 # from aaa.identityProvider.ldap_conf import *

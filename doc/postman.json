@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "7205fcc6-05b8-455e-b6cd-66f2839d21b3",
+		"_postman_id": "d230123c-09da-4643-bfd8-4efef220340d",
 		"name": "sso",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -85,40 +85,6 @@
 				"body": {
 					"mode": "raw",
 					"raw": "{\n    \"username\": \"admin@automation.local\",\n    \"password\": \"password\" \n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{ssoBaseUrl}}/token/",
-					"host": [
-						"{{ssoBaseUrl}}"
-					],
-					"path": [
-						"token",
-						""
-					],
-					"query": [
-						{
-							"key": "",
-							"value": null,
-							"disabled": true
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Token (workflow system user)",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"username\": \"workflow@automation.local\",\n    \"password\": \"password\" \n}",
 					"options": {
 						"raw": {
 							"language": "json"

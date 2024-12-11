@@ -40,7 +40,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
                 groups = []
                 for g in user.ldap_user.group_dns:
                     # Prevent "tampered" admin group.
-                    if g != "automation.local" and g != "workflow.local":
+                    if g != "automation.local":
                         groups.append(g.lower())
             else:
                 groups = []
@@ -48,10 +48,6 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
             # Local superadmin.
             if user.username == "admin@automation.local":
                 groups = ["automation.local"]
-
-            # Workflow service user.
-            if user.username == "workflow@automation.local":
-                groups = ["workflow.local"]
 
             # AD superadmin: add automation.local (the superadmin group) to the group list of the user.
             for g in settings.SUPERADMIN_IDENTITY_AD_GROUPS:
