@@ -1,9 +1,9 @@
 asgiref==3.8.1
-certifi==2025.1.31
+certifi==2025.4.26
 cffi==1.17.1
-charset-normalizer==3.4.1
+charset-normalizer==3.4.2
 cryptography==41.0.7
-Django==4.2.19
+Django==4.2.20
 django-auth-ldap==4.5.0
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.3.1
@@ -11,11 +11,11 @@ future==0.18.3
 idna==3.10
 mysqlclient==2.1.1
 pyasn1==0.6.1
-pyasn1_modules==0.4.1
+pyasn1_modules==0.4.2
 pycparser==2.22
 PyJWT==2.8.0
 python-ldap==3.4.4
-pytz==2025.1
+pytz==2025.2
 requests==2.31.0
 sqlparse==0.5.3
 urllib3==2.0.7
