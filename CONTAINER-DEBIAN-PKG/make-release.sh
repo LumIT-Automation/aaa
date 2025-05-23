@@ -116,7 +116,7 @@ function System_cleanup()
 
 function System_serviceDebCreate()
 {
-    bash DEBIAN-PKG/make-release.sh --action deb
+    shortName=$shortName bash DEBIAN-PKG/make-release.sh --action deb
 }
 
 

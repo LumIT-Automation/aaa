@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "d230123c-09da-4643-bfd8-4efef220340d",
+		"_postman_id": "8ffae311-316b-49da-8974-5968a186f3fb",
 		"name": "sso",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -52,6 +52,31 @@
 							"path": [
 								"doc",
 								"swagger.yaml",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "about",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwttoken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{ssoBaseUrl}}/doc/about.json/",
+							"host": [
+								"{{ssoBaseUrl}}"
+							],
+							"path": [
+								"doc",
+								"about.json",
 								""
 							]
 						}
