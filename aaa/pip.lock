@@ -1,9 +1,9 @@
-asgiref==3.8.1
-certifi==2025.4.26
+asgiref==3.9.1
+certifi==2025.7.14
 cffi==1.17.1
 charset-normalizer==3.4.2
 cryptography==41.0.7
-Django==4.2.21
+Django==4.2.23
 django-auth-ldap==4.5.0
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.3.1
